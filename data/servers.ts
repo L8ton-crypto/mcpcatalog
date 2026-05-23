@@ -1,0 +1,352 @@
+export type Transport = 'stdio' | 'sse' | 'http';
+export type Client =
+  | 'Claude Code'
+  | 'Claude Desktop'
+  | 'Cursor'
+  | 'Kiro'
+  | 'Cline'
+  | 'Zed'
+  | 'Windsurf';
+
+export type Category =
+  | 'Filesystem'
+  | 'Git & Source'
+  | 'Databases'
+  | 'Web & Browsing'
+  | 'Productivity'
+  | 'Observability'
+  | 'Cloud Platforms'
+  | 'Enterprise Apps'
+  | 'Communication'
+  | 'Memory & Reasoning';
+
+export interface McpServer {
+  id: string;
+  name: string;
+  vendor: string;
+  vendorType: 'Anthropic' | 'Vendor-official' | 'Community';
+  category: Category;
+  transports: Transport[];
+  clients: Client[];
+  toolCount: number | string;
+  description: string;
+  install: string;
+  repoUrl: string;
+  docsUrl?: string;
+}
+
+export const servers: McpServer[] = [
+  {
+    id: 'filesystem',
+    name: 'Filesystem',
+    vendor: 'Anthropic',
+    vendorType: 'Anthropic',
+    category: 'Filesystem',
+    transports: ['stdio'],
+    clients: ['Claude Code', 'Claude Desktop', 'Cursor', 'Kiro', 'Cline', 'Zed', 'Windsurf'],
+    toolCount: 11,
+    description: 'Read, write, search and manage files within whitelisted directories. The reference filesystem server every coding agent runs by default.',
+    install: 'npx -y @modelcontextprotocol/server-filesystem /path/to/allowed/dir',
+    repoUrl: 'https://github.com/modelcontextprotocol/servers/tree/main/src/filesystem',
+  },
+  {
+    id: 'github',
+    name: 'GitHub',
+    vendor: 'GitHub',
+    vendorType: 'Vendor-official',
+    category: 'Git & Source',
+    transports: ['stdio', 'http'],
+    clients: ['Claude Code', 'Claude Desktop', 'Cursor', 'Kiro', 'Cline', 'Zed', 'Windsurf'],
+    toolCount: 40,
+    description: 'Issues, PRs, branches, releases, code search across the GitHub API. The vendor-official replacement for the original community server.',
+    install: 'docker run -e GITHUB_TOKEN=$GH_TOKEN ghcr.io/github/github-mcp-server',
+    repoUrl: 'https://github.com/github/github-mcp-server',
+    docsUrl: 'https://docs.github.com/en/copilot/customizing-copilot/extending-copilot-chat-with-mcp',
+  },
+  {
+    id: 'git',
+    name: 'Git',
+    vendor: 'Anthropic',
+    vendorType: 'Anthropic',
+    category: 'Git & Source',
+    transports: ['stdio'],
+    clients: ['Claude Code', 'Claude Desktop', 'Cursor', 'Kiro', 'Cline'],
+    toolCount: 13,
+    description: 'Local git operations - status, diff, log, blame, branch, checkout, commit. Pairs naturally with the GitHub server for full repo workflows.',
+    install: 'uvx mcp-server-git --repository /path/to/repo',
+    repoUrl: 'https://github.com/modelcontextprotocol/servers/tree/main/src/git',
+  },
+  {
+    id: 'postgres',
+    name: 'PostgreSQL',
+    vendor: 'Anthropic',
+    vendorType: 'Anthropic',
+    category: 'Databases',
+    transports: ['stdio'],
+    clients: ['Claude Code', 'Claude Desktop', 'Cursor', 'Cline', 'Zed'],
+    toolCount: 1,
+    description: 'Read-only SQL queries against a Postgres database with schema inspection. Safe by default - no writes, no DDL.',
+    install: 'npx -y @modelcontextprotocol/server-postgres "postgresql://user:pass@host/db"',
+    repoUrl: 'https://github.com/modelcontextprotocol/servers/tree/main/src/postgres',
+  },
+  {
+    id: 'sqlite',
+    name: 'SQLite',
+    vendor: 'Anthropic',
+    vendorType: 'Anthropic',
+    category: 'Databases',
+    transports: ['stdio'],
+    clients: ['Claude Code', 'Claude Desktop', 'Cursor', 'Cline'],
+    toolCount: 6,
+    description: 'Full SQLite access - read, write, schema, list tables. Useful for agents working against a local app database.',
+    install: 'uvx mcp-server-sqlite --db-path /path/to/db.sqlite',
+    repoUrl: 'https://github.com/modelcontextprotocol/servers/tree/main/src/sqlite',
+  },
+  {
+    id: 'snowflake-cortex',
+    name: 'Snowflake Cortex',
+    vendor: 'Snowflake',
+    vendorType: 'Vendor-official',
+    category: 'Databases',
+    transports: ['stdio', 'http'],
+    clients: ['Claude Code', 'Claude Desktop', 'Cursor', 'Kiro'],
+    toolCount: 8,
+    description: 'Cortex Analyst (semantic model queries) plus Cortex Search across Snowflake data, scoped by the CORTEX_USER role. Announced with Appian at Appian World 2026.',
+    install: 'pip install snowflake-mcp && snowflake-mcp --account YOUR_ACCT',
+    repoUrl: 'https://github.com/Snowflake-Labs/mcp',
+  },
+  {
+    id: 'puppeteer',
+    name: 'Puppeteer',
+    vendor: 'Anthropic',
+    vendorType: 'Anthropic',
+    category: 'Web & Browsing',
+    transports: ['stdio'],
+    clients: ['Claude Code', 'Claude Desktop', 'Cursor', 'Cline'],
+    toolCount: 7,
+    description: 'Headless Chrome - navigate, screenshot, click, fill forms, run JS. The default browser-automation MCP.',
+    install: 'npx -y @modelcontextprotocol/server-puppeteer',
+    repoUrl: 'https://github.com/modelcontextprotocol/servers/tree/main/src/puppeteer',
+  },
+  {
+    id: 'fetch',
+    name: 'Fetch',
+    vendor: 'Anthropic',
+    vendorType: 'Anthropic',
+    category: 'Web & Browsing',
+    transports: ['stdio'],
+    clients: ['Claude Code', 'Claude Desktop', 'Cursor', 'Kiro', 'Cline', 'Zed', 'Windsurf'],
+    toolCount: 1,
+    description: 'Fetch a URL and return clean markdown. Stripped-down alternative to a full browser when all you need is page text.',
+    install: 'uvx mcp-server-fetch',
+    repoUrl: 'https://github.com/modelcontextprotocol/servers/tree/main/src/fetch',
+  },
+  {
+    id: 'brave-search',
+    name: 'Brave Search',
+    vendor: 'Anthropic',
+    vendorType: 'Anthropic',
+    category: 'Web & Browsing',
+    transports: ['stdio'],
+    clients: ['Claude Code', 'Claude Desktop', 'Cursor', 'Cline'],
+    toolCount: 2,
+    description: 'Web and local search via the Brave Search API. Standard fallback when an agent needs current info beyond its training cutoff.',
+    install: 'npx -y @modelcontextprotocol/server-brave-search',
+    repoUrl: 'https://github.com/modelcontextprotocol/servers/tree/main/src/brave-search',
+  },
+  {
+    id: 'slack',
+    name: 'Slack',
+    vendor: 'Anthropic',
+    vendorType: 'Anthropic',
+    category: 'Communication',
+    transports: ['stdio'],
+    clients: ['Claude Code', 'Claude Desktop', 'Cursor', 'Kiro'],
+    toolCount: 8,
+    description: 'List channels, post messages, reply in threads, react, fetch history. Workspace token required.',
+    install: 'npx -y @modelcontextprotocol/server-slack',
+    repoUrl: 'https://github.com/modelcontextprotocol/servers/tree/main/src/slack',
+  },
+  {
+    id: 'linear',
+    name: 'Linear',
+    vendor: 'Linear',
+    vendorType: 'Vendor-official',
+    category: 'Productivity',
+    transports: ['http'],
+    clients: ['Claude Code', 'Claude Desktop', 'Cursor', 'Kiro', 'Zed'],
+    toolCount: 18,
+    description: 'Issues, projects, cycles, comments via Linear OAuth. Vendor-hosted, no local install. Strong default for agent-driven planning workflows.',
+    install: 'claude mcp add linear --transport http https://mcp.linear.app/sse',
+    repoUrl: 'https://linear.app/docs/mcp',
+  },
+  {
+    id: 'atlassian',
+    name: 'Atlassian (Jira + Confluence)',
+    vendor: 'Atlassian',
+    vendorType: 'Vendor-official',
+    category: 'Enterprise Apps',
+    transports: ['http'],
+    clients: ['Claude Code', 'Claude Desktop', 'Cursor'],
+    toolCount: 25,
+    description: 'Vendor-hosted remote MCP covering Jira issues plus Confluence pages and spaces. OAuth-based, no token management on the agent side.',
+    install: 'claude mcp add atlassian --transport http https://mcp.atlassian.com/v1/sse',
+    repoUrl: 'https://www.atlassian.com/blog/announcements/atlassian-mcp-server',
+  },
+  {
+    id: 'stripe',
+    name: 'Stripe',
+    vendor: 'Stripe',
+    vendorType: 'Vendor-official',
+    category: 'Enterprise Apps',
+    transports: ['stdio', 'http'],
+    clients: ['Claude Code', 'Claude Desktop', 'Cursor', 'Kiro'],
+    toolCount: 21,
+    description: 'Customers, products, prices, payment links, invoices, subscriptions, refunds via the Stripe API. Restricted key recommended.',
+    install: 'npx -y @stripe/mcp --tools=all --api-key=sk_test_...',
+    repoUrl: 'https://github.com/stripe/agent-toolkit',
+  },
+  {
+    id: 'sentry',
+    name: 'Sentry',
+    vendor: 'Sentry',
+    vendorType: 'Vendor-official',
+    category: 'Observability',
+    transports: ['stdio', 'http'],
+    clients: ['Claude Code', 'Claude Desktop', 'Cursor'],
+    toolCount: 14,
+    description: 'Issues, events, releases, replays from a Sentry org. Pair with the GitHub server to auto-link error traces back to commits.',
+    install: 'claude mcp add sentry --transport http https://mcp.sentry.dev/sse',
+    repoUrl: 'https://docs.sentry.io/product/sentry-mcp/',
+  },
+  {
+    id: 'vercel',
+    name: 'Vercel',
+    vendor: 'Vercel',
+    vendorType: 'Vendor-official',
+    category: 'Cloud Platforms',
+    transports: ['stdio', 'http'],
+    clients: ['Claude Code', 'Claude Desktop', 'Cursor', 'Kiro'],
+    toolCount: 30,
+    description: 'Projects, deployments, env vars, domains, logs, runtime traces. The default cloud platform MCP for Next.js shops.',
+    install: 'claude mcp add vercel --transport http https://mcp.vercel.com/sse',
+    repoUrl: 'https://vercel.com/docs/mcp/vercel-mcp',
+  },
+  {
+    id: 'cloudflare',
+    name: 'Cloudflare',
+    vendor: 'Cloudflare',
+    vendorType: 'Vendor-official',
+    category: 'Cloud Platforms',
+    transports: ['http'],
+    clients: ['Claude Code', 'Claude Desktop', 'Cursor'],
+    toolCount: 24,
+    description: 'Workers, KV, R2, D1, Pages, DNS records via Cloudflare API. Remote-hosted, OAuth via the Cloudflare dashboard.',
+    install: 'claude mcp add cloudflare --transport http https://mcp.cloudflare.com/sse',
+    repoUrl: 'https://github.com/cloudflare/mcp-server-cloudflare',
+  },
+  {
+    id: 'appian',
+    name: 'Appian',
+    vendor: 'Appian',
+    vendorType: 'Vendor-official',
+    category: 'Enterprise Apps',
+    transports: ['http'],
+    clients: ['Claude Code', 'Kiro'],
+    toolCount: 17,
+    description: 'Spec-driven app build, Composer app-estate context, record types, process model orchestration. Announced at Appian World 2026 (28 April).',
+    install: 'claude mcp add appian --transport http https://mcp.appian.com/sse',
+    repoUrl: 'https://docs.appian.com/suite/help/latest/Appian_MCP_Server.html',
+  },
+  {
+    id: 'memory',
+    name: 'Memory',
+    vendor: 'Anthropic',
+    vendorType: 'Anthropic',
+    category: 'Memory & Reasoning',
+    transports: ['stdio'],
+    clients: ['Claude Code', 'Claude Desktop', 'Cursor', 'Cline'],
+    toolCount: 9,
+    description: 'Knowledge-graph memory across sessions - entities, relations, observations. Reference implementation for persistent agent context.',
+    install: 'npx -y @modelcontextprotocol/server-memory',
+    repoUrl: 'https://github.com/modelcontextprotocol/servers/tree/main/src/memory',
+  },
+  {
+    id: 'sequential-thinking',
+    name: 'Sequential Thinking',
+    vendor: 'Anthropic',
+    vendorType: 'Anthropic',
+    category: 'Memory & Reasoning',
+    transports: ['stdio'],
+    clients: ['Claude Code', 'Claude Desktop', 'Cursor', 'Cline', 'Zed'],
+    toolCount: 1,
+    description: 'Forces multi-step structured reasoning - the agent must produce thought_n, branch, revise. Useful on long planning tasks.',
+    install: 'npx -y @modelcontextprotocol/server-sequential-thinking',
+    repoUrl: 'https://github.com/modelcontextprotocol/servers/tree/main/src/sequentialthinking',
+  },
+  {
+    id: 'time',
+    name: 'Time',
+    vendor: 'Anthropic',
+    vendorType: 'Anthropic',
+    category: 'Productivity',
+    transports: ['stdio'],
+    clients: ['Claude Code', 'Claude Desktop', 'Cursor', 'Kiro', 'Cline', 'Zed', 'Windsurf'],
+    toolCount: 2,
+    description: 'Current time and timezone conversion. Tiny but the most-installed server alongside Filesystem - agents have no clock by default.',
+    install: 'uvx mcp-server-time --local-timezone=Europe/London',
+    repoUrl: 'https://github.com/modelcontextprotocol/servers/tree/main/src/time',
+  },
+  {
+    id: 'google-drive',
+    name: 'Google Drive',
+    vendor: 'Anthropic',
+    vendorType: 'Anthropic',
+    category: 'Productivity',
+    transports: ['stdio'],
+    clients: ['Claude Code', 'Claude Desktop', 'Cursor'],
+    toolCount: 5,
+    description: 'Search and read Google Docs, Sheets and Slides via OAuth. Read-only by design - no write or share permissions.',
+    install: 'npx -y @modelcontextprotocol/server-gdrive',
+    repoUrl: 'https://github.com/modelcontextprotocol/servers/tree/main/src/gdrive',
+  },
+  {
+    id: 'notion',
+    name: 'Notion',
+    vendor: 'Notion',
+    vendorType: 'Vendor-official',
+    category: 'Productivity',
+    transports: ['http'],
+    clients: ['Claude Code', 'Claude Desktop', 'Cursor', 'Kiro'],
+    toolCount: 19,
+    description: 'Pages, databases, blocks, comments via the Notion API. Vendor-hosted remote MCP - OAuth from the Notion workspace.',
+    install: 'claude mcp add notion --transport http https://mcp.notion.com/sse',
+    repoUrl: 'https://developers.notion.com/docs/mcp',
+  },
+];
+
+export const allClients: Client[] = [
+  'Claude Code',
+  'Claude Desktop',
+  'Cursor',
+  'Kiro',
+  'Cline',
+  'Zed',
+  'Windsurf',
+];
+
+export const allTransports: Transport[] = ['stdio', 'sse', 'http'];
+
+export const allCategories: Category[] = [
+  'Filesystem',
+  'Git & Source',
+  'Databases',
+  'Web & Browsing',
+  'Productivity',
+  'Observability',
+  'Cloud Platforms',
+  'Enterprise Apps',
+  'Communication',
+  'Memory & Reasoning',
+];
+ 
