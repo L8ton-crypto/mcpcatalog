@@ -349,4 +349,3 @@ export const allCategories: Category[] = [
   'Communication',
   'Memory & Reasoning',
 ];
- 
